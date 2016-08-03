@@ -5,6 +5,7 @@ from functools import partial
 import time
 import csv
 import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 tips = []
 def load_categories():
@@ -88,8 +89,30 @@ def build_usrlocation_matrix(user_tips, sub_categories):
     for i in index:
         for cat in sub_categories:
             usrlocation_matrix.ix[i][cat] = len((subset[subset['User_ID']==i])[subset['Category_ID']==cat].index)
-
     return usrlocation_matrix
+
+def categoryid_to_doc(catids, categories, level=2):
+    usr_category_doc = ''
+    for key in categories.keys():
+        for cat in categories[key]['categories']:
+            if cat['id'] in catids:
+                if level == 2:
+                    usr_category_doc += cat['name'].replace (" ", "_") + ' '
+                else:
+                    usr_category_doc += str(hash(key)) + ' '
+                    # usr_category_doc += key.replace(" ", "_") + ' '
+    return usr_category_doc
+
+
+def build_usr_pref(user_tips, categories):
+    user_pref_level2 = {}
+    user_pref_level1 = {}
+    users = user_tips['User_ID'].unique()
+    for usr_id in users:
+        catids = (user_tips[user_tips['User_ID']==usr_id])['Category_ID'].values
+        user_pref_level2[usr_id] = categoryid_to_doc(list(catids), categories)
+        user_pref_level1[usr_id] = categoryid_to_doc(list(catids), categories, level=1)
+    return user_pref_level1, user_pref_level2
 
 def power_method(mat, start, maxit):
     """
@@ -114,17 +137,33 @@ if __name__=="__main__":
     # sub_categories_shop = get_sub_category_ids(categories['Shop']['categories'])
     venues_df = load_venues()
 
+    '''
+    ###### Processing User Tips
+    '''
     # start_time = time.time()
     # user_tips = load_tips_parallel(venues_df)
     # print time.time() - start_time
     # write_users_tips(user_tips, venues_df)
 
+    '''
+    ###### Social Knowledge Learning ....
+    '''
     user_tips = load_users_tips()
-    usr_location_matrix = build_usrlocation_matrix(user_tips, sub_categories_shop)
+    # usr_location_matrix = build_usrlocation_matrix(user_tips, sub_categories_shop)
+    #
+    # M = usr_location_matrix.as_matrix()
+    # user_hub__initial_score = usr_location_matrix.sum(axis=1).values
+    # user_hub_score = power_method(np.dot(M, M.T), user_hub__initial_score, 100)
+    #
+    # venue_auth_initial_score = usr_location_matrix.sum(axis=0).values
+    # venue_hub_score = power_method(np.dot(M.T, M), venue_auth_initial_score, 100)
 
-    M = usr_location_matrix.as_matrix()
-    user_hub__initial_score = usr_location_matrix.sum(axis=1).values
-    user_hub_score = power_method(np.dot(M, M.T), user_hub__initial_score, 100)
-
-    venue_auth_initial_score = usr_location_matrix.sum(axis=0).values
-    venue_hub_score = power_method(np.dot(M.T, M), venue_auth_initial_score, 100)
+    '''
+    #### Personal Preference Discovery
+    '''
+    user_pref_level1, user_pref_level2 = build_usr_pref(user_tips, categories)
+    vectorizer = TfidfVectorizer()
+    vectors_level1 = vectorizer.fit_transform(user_pref_level1.values()).toarray()
+    words_level1 = vectorizer.get_feature_names()
+    vectors_level2 = vectorizer.fit_transform(user_pref_level2.values()).toarray()
+    words_level2 = vectorizer.get_feature_names()
