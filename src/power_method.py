@@ -9,7 +9,7 @@ def power_method(mat, start, maxit):
     """
     result = start
     for i in xrange(maxit):
-        result = mat*result
+        result = np.dot(mat, result)
         result = result/np.linalg.norm(result)
     return result
 
@@ -45,5 +45,3 @@ def main():
     import pdb; pdb.set_trace()
     eigmax = power_method(rndmat, rndvec, nbit)
     check(rndmat, eigmax)
-
-main()
