@@ -37,6 +37,9 @@ def load_venues():
     df['category_id1'] = df['category_id1'].apply(lambda x: str(x).strip('\"'))
     venues_df = df
 
+def get_venues_by_id(venue_list):
+    return venues_df[venues_df['Venue_id'].isin(venue_list)]
+
 def get_venues_sp_range(sr, falg=True):
     venue_list = []
     lat_long = \

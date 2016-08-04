@@ -1,6 +1,5 @@
 import venues
 import users
-#import data_loader
 import categories
 import candidate_selection as cs
 
@@ -12,20 +11,13 @@ def load_data():
 
 if __name__=='__main__':
     load_data()
-    sr = venues.SpatialRange(33.7482354, -118.4071307, 5.0)
+    sr = venues.SpatialRange(33.7482354, -118.4071307, 50.0)
     venue_list = venues.get_venues_sp_range(sr)
     user_list = users.get_visited_users(venue_list)
     print len(user_list), user_list
 
-    # data = data_loader.load_categories()
-    # categories =  data_loader.get_categories(data)
-    # sub_categories_shop = \
-    #   data_loader.get_sub_category_ids(categories['Shop']['categories'])
-    # user_hub_score, venue_hub_score = \
-    #                     users.user_venue_scores(sub_categories_shop)
-
     high_level_cat = categories.get_categories()
-    user_pref_level1, user_pref_level2 = \
+    user_pref_level1, user_pref_level2, usrs = \
                                 users.build_usr_pref(high_level_cat)
     words_level_1, vectors_level1 = \
         users.get_peronalpreference_vectors(high_level_cat.keys(), user_pref_level1.values())
@@ -39,3 +31,4 @@ if __name__=='__main__':
     candidate_venues, expert_users = \
                         cs.candidate_selection(sr, u_wch, 5)
     print candidate_venues, expert_users
+    suggest_df = venues.get_venues_by_id(candidate_venues)
