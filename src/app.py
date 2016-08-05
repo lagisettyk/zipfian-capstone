@@ -11,7 +11,7 @@ def load_data():
 
 if __name__=='__main__':
     load_data()
-    sr = venues.SpatialRange(33.7482354, -118.4071307, 50.0)
+    sr = venues.SpatialRange(33.7482354, -118.4071307, 20.0)
     venue_list = venues.get_venues_sp_range(sr)
     user_list = users.get_visited_users(venue_list)
     print len(user_list), user_list
