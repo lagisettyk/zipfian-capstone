@@ -2,12 +2,14 @@ import pandas as pd
 import numpy as np
 import power_method
 from sklearn.feature_extraction.text import TfidfVectorizer
+from collections import OrderedDict
+import categories as cat
 
 users_df = None
 
 def load_users_tips():
     global users_df
-    users_df = pd.read_csv('../data/Tips/LA/LA-User-Tips.csv')
+    users_df = pd.read_csv('../data/Tips/LA/LA-User-Tips-2500.csv')
 
 def get_visited_users(venue_list):
     return users_df[users_df['Venue_ID'].isin(venue_list)]['User_ID'].values
@@ -25,6 +27,7 @@ def build_usrlocation_matrix(sub_categories):
     return usrlocation_matrix, index
 
 def build_usrlocation_matrix_by_venues(cat_id):
+    import pdb; pdb.set_trace()
     subset = users_df[users_df['Category_ID']==cat_id]
     index = subset['User_ID'].unique()
     cols = subset['Venue_ID'].unique()
@@ -41,14 +44,19 @@ def categoryid_to_doc(catids, categories, level=2):
             if cat['id'] in catids:
                 if level == 2:
                     # usr_category_doc += cat['name'].replace (" ", "_") + ' '
-                    usr_category_doc += cat['name'] + ' '
+                    usr_category_doc += cat['name'] + '||'
                 else:
                     #  usr_category_doc += str(hash(key)) + ' '
-                    usr_category_doc += key + ' '
+                    #usr_category_doc += key + ' '
+                    usr_category_doc += key + '||'
     return usr_category_doc
 
+def tokenize(doc):
+    return [word for word in doc.rstrip('||').split('||')]
+
 def get_peronalpreference_vectors(vocab, user_pref_values):
-    vectorizer = TfidfVectorizer(vocabulary=vocab, lowercase=False)
+    tokens = tokenize(user_pref_values[0])
+    vectorizer = TfidfVectorizer(vocabulary=vocab, lowercase=False, tokenizer=tokenize)
     vectors = vectorizer.fit_transform(user_pref_values).toarray()
     words = vectorizer.get_feature_names()
     # idf = vectorizer.idf_
@@ -63,7 +71,7 @@ def build_usr_pref(categories):
         catids = (users_df[users_df['User_ID']==usr_id])['Category_ID'].values
         user_pref_level2[usr_id] = categoryid_to_doc(list(catids), categories)
         user_pref_level1[usr_id] = categoryid_to_doc(list(catids), categories, level=1)
-    return user_pref_level1, user_pref_level2, usrs
+    return OrderedDict(user_pref_level1), OrderedDict(user_pref_level2)
 
 def user_venue_scores(usr_location_matrix):
     M = usr_location_matrix.as_matrix()
@@ -75,16 +83,39 @@ def user_venue_scores(usr_location_matrix):
 
     return user_hub_score, venue_hub_score
 
-
-def user_venue_scores_by_category(sub_categories):
+def user_venue_scores_by_category_precompute(key, sub_categories):
     usr_location_matrix, users_index = build_usrlocation_matrix(sub_categories)
     user_hub_score, venue_hub_score = user_venue_scores(usr_location_matrix)
     return user_hub_score, venue_hub_score, users_index
 
-def user_venue_scores_by_venue(cat_id):
+def user_venue_scores_by_venue_precompute(key):
     usr_location_matrix, users_index = build_usrlocation_matrix_by_venues(cat_id)
     user_hub_score, venue_hub_score = user_venue_scores(usr_location_matrix)
     return user_hub_score, venue_hub_score, users_index
+
+
+def user_venue_scores_by_category(key, sub_categories):
+    user_hub_score = np.load('../data/'+key+'_user_hub_score.npy')
+    venue_hub_score = np.load('../data/'+key+'_venue_hub_score.npy')
+    users_index = np.load('../data/'+key+'_users_index.npy')
+    return user_hub_score, venue_hub_score, users_index
+
+def user_venue_scores_by_venue(key):
+    user_hub_score = np.load('../data/scores/'+key+'_user_hub_score.npy')
+    venue_hub_score = np.load('../data/scores/'+key+'_venue_hub_score.npy')
+    users_index = np.load('../data/scores/'+key+'_users_index.npy')
+    return user_hub_score, venue_hub_score, users_index
+
+def build_usr_personal_pref_hierarchy():
+    high_level_cat = cat.get_categories()
+    user_pref_level1, user_pref_level2 = \
+                                build_usr_pref(high_level_cat)
+    words_level_1, vectors_level1 = \
+        get_peronalpreference_vectors(high_level_cat.keys(), user_pref_level1.values())
+    words_level_2, vectors_level2 = \
+        get_peronalpreference_vectors(cat.get_sub_categories_names(high_level_cat), \
+                                                        user_pref_level2.values())
+    return words_level_1, vectors_level1, words_level_2, vectors_level2
 
 
 
