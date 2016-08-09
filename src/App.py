@@ -1,9 +1,10 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for
 from flask_googlemaps import GoogleMaps
 from flask_googlemaps import Map
 import backend as service
+from flask import request
 
-app = Flask(__name__, template_folder="startbootstrap-simple-sidebar-gh-pages")
+app = Flask(__name__, template_folder="templates")
 
 # you can set key as config
 app.config['GOOGLEMAPS_KEY'] = "AIzaSyBTT8YSKGtJV9ZVcoVEqHUJuLCLPqXXAto"
@@ -16,14 +17,32 @@ def home():
     return render_template('index.html')
 
 
-@app.route("/analysis")
+# @app.route('/new', methods=['POST'] )
+# def testform():
+#     # get data from request form, the key is the name you set in your form
+#     data = request.form['user_input']
+#     print data
+#     return redirect(url_for('mapview', messages={"Latitude": 1234, "Longitude": 5876}))
+
+
+@app.route("/analysis", methods=['POST','GET'])
 def mapview():
-    suggestions = service.run()
+    suggestions = None
+    if len(request.form) != 0:
+        latitude = float(request.form["latitude"])
+        longitude = float(request.form["longitude"])
+        userid = int(request.form["userid"])
+        print latitude, longitude, userid
+        suggestions = service.run(latitude, longitude, userid)
+    else:
+        suggestions = service.run()
     print suggestions['Venue_name'].values[0], suggestions['Venue_name'].values[1]
     sndmap = Map(
         identifier="sndmap",
         lat= suggestions['latitude'].values[0],
         lng= suggestions['longitude'].values[0],
+        style="height:500px;width:750px;margin:0;",
+        collapsible= True,
         markers=[
           {
              'icon': 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
@@ -59,8 +78,8 @@ def mapview():
 
         ]
     )
-    return render_template('example.html', sndmap=sndmap)
+    return render_template('recommend.html', sndmap=sndmap)
     # return render_template('example.html', mymap=mymap)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=12345)

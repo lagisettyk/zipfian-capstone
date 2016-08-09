@@ -35,16 +35,16 @@ def final_candidates(candidates_per_expert, similar_users, user_id, k):
             break
     return final_candidates
 
-def run():
+def run(latitude=33.842623, longitude=-118.288384079933, userid=27):
     load_data()
     high_level_cat = categories.get_categories()
     user_pref_level1, user_pref_level2 = \
                                     users.build_usr_pref(high_level_cat)
-    usr_index = 27
+    usr_index = userid
     user_id = user_pref_level1.keys()[usr_index]
-    sr = venues.SpatialRange(33.842623, -118.288384079933, 8.0)
+    sr = venues.SpatialRange(latitude, longitude, 8.0)
     candidate_venues, expert_users, candidates_per_expert = \
-                                    candidate_suggestions(sr, usr_index, k=10)
+                                    candidate_suggestions(sr, usr_index, k=8)
     # print candidate_venues, expert_users, candidates_per_expert
     #similar_users = lr.similar_users_rankorder_bycosine(user_id, expert_users)
     similar_users = lr.similar_users_rankorder(user_id, expert_users)
