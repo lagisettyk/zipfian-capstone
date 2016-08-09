@@ -27,7 +27,6 @@ def build_usrlocation_matrix(sub_categories):
     return usrlocation_matrix, index
 
 def build_usrlocation_matrix_by_venues(cat_id):
-    import pdb; pdb.set_trace()
     subset = users_df[users_df['Category_ID']==cat_id]
     index = subset['User_ID'].unique()
     cols = subset['Venue_ID'].unique()
@@ -83,28 +82,30 @@ def user_venue_scores(usr_location_matrix):
 
     return user_hub_score, venue_hub_score
 
-def user_venue_scores_by_category_precompute(key, sub_categories):
+
+def user_venue_scores_by_category_precompute(sub_categories):
     usr_location_matrix, users_index = build_usrlocation_matrix(sub_categories)
     user_hub_score, venue_hub_score = user_venue_scores(usr_location_matrix)
-    return user_hub_score, venue_hub_score, users_index
+    return user_hub_score, venue_hub_score, users_index, usr_location_matrix
 
-def user_venue_scores_by_venue_precompute(key):
+def user_venue_scores_by_venue_precompute(cat_id):
     usr_location_matrix, users_index = build_usrlocation_matrix_by_venues(cat_id)
     user_hub_score, venue_hub_score = user_venue_scores(usr_location_matrix)
-    return user_hub_score, venue_hub_score, users_index
+    return user_hub_score, venue_hub_score, users_index, usr_location_matrix
 
-
-def user_venue_scores_by_category(key, sub_categories):
-    user_hub_score = np.load('../data/'+key+'_user_hub_score.npy')
-    venue_hub_score = np.load('../data/'+key+'_venue_hub_score.npy')
-    users_index = np.load('../data/'+key+'_users_index.npy')
-    return user_hub_score, venue_hub_score, users_index
+def user_venue_scores_by_category(key):
+    user_hub_score = np.load('../data/scores/'+key+'_user_hub_score.npy')
+    venue_hub_score = np.load('../data/scores/'+key+'_venue_hub_score.npy')
+    users_index = np.load('../data/scores/'+key+'_users_index.npy')
+    usr_location_matrix = np.load('../data/scores/'+ key+"_users_location_matrix.npy")
+    return user_hub_score, venue_hub_score, users_index, usr_location_matrix
 
 def user_venue_scores_by_venue(key):
     user_hub_score = np.load('../data/scores/'+key+'_user_hub_score.npy')
     venue_hub_score = np.load('../data/scores/'+key+'_venue_hub_score.npy')
     users_index = np.load('../data/scores/'+key+'_users_index.npy')
-    return user_hub_score, venue_hub_score, users_index
+    usr_location_matrix = np.load('../data/scores/'+ key+"_users_location_matrix.npy")
+    return user_hub_score, venue_hub_score, users_index, usr_location_matrix
 
 def build_usr_personal_pref_hierarchy():
     high_level_cat = cat.get_categories()

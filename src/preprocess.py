@@ -64,22 +64,24 @@ def preprocess_social_learning_highlevel_cat_scores():
     for key in high_level.keys():
         sub_categories_ids = \
             cat.get_sub_category_ids(high_level[key]['categories'])
-        user_hub_score, venue_hub_score, users_index = \
+        user_hub_score, venue_hub_score, users_index, usr_location_matrix = \
                      users.user_venue_scores_by_category_precompute(sub_categories_ids)
-        np.save('../data/'+ key+"_user_hub_score", user_hub_score)
-        np.save('../data/'+ key+"_venue_hub_score", venue_hub_score)
-        np.save('../data/'+ key+"_users_index", users_index)
+        np.save('../data/scores/'+ key+"_user_hub_score", user_hub_score)
+        np.save('../data/scores/'+ key+"_venue_hub_score", venue_hub_score)
+        np.save('../data/scores/'+ key+"_users_index", users_index)
+        np.save('../data/scores/'+ key+"_users_location_matrix", usr_location_matrix)
 
 def preprocess_social_learning_venue_scores():
     high_level = cat.get_categories()
     sub_dict = cat.get_sub_categories_id_dict(high_level)
     for key in sub_dict.keys():
         cat_id = sub_dict[key]
-        user_hub_score, venue_hub_score, users_index = \
+        user_hub_score, venue_hub_score, users_index, usr_location_matrix = \
                 users.user_venue_scores_by_venue_precompute(cat_id)
         np.save('../data/scores/'+ key +"_user_hub_score", user_hub_score)
         np.save('../data/scores/'+ key +"_venue_hub_score", venue_hub_score)
         np.save('../data/scores/'+ key +"_users_index", users_index)
+        np.save('../data/scores/'+ key+"_users_location_matrix", usr_location_matrix)
 
 
 
@@ -87,5 +89,5 @@ def preprocess_social_learning_venue_scores():
 if __name__ == "__main__":
     load_raw_data()
     #preprocess_usr_tips()
-    # preprocess_social_learning_highlevel_cat_scores()
+    #preprocess_social_learning_highlevel_cat_scores()
     preprocess_social_learning_venue_scores()

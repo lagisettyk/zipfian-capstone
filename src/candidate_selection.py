@@ -8,14 +8,12 @@ def top_experts(k, U, ct):
     high_level = cat.get_categories()
     sub_dict = cat.get_sub_categories_id_dict(high_level)
     if ct in sub_dict:
-        user_hub_score, venue_hub_score, users_index = \
+        user_hub_score, venue_hub_score, users_index, usr_location_matrix = \
                 users.user_venue_scores_by_venue(ct)
     else:
         high_level_category = ct
-        sub_categories = \
-            cat.get_sub_category_ids(high_level[high_level_category]['categories'])
-        user_hub_score, venue_hub_score, users_index = \
-                            users.user_venue_scores_by_category(high_level_category, sub_categories)
+        user_hub_score, venue_hub_score, users_index, usr_location_matrix = \
+                        users.user_venue_scores_by_category(high_level_category)
     index =  np.argsort(-user_hub_score)
     expert_users = []
     for i in index:
@@ -39,6 +37,7 @@ def candidate_selection(sr, u_wch, N):
     '''
     candidate_venues = set()
     expert_users = set()
+    candidates_per_expert = {}
     #Step 1 Retrieve venues V'
     venue_list = venues.get_venues_sp_range(sr)
     users_list = users.get_visited_users(venue_list)
@@ -59,6 +58,6 @@ def candidate_selection(sr, u_wch, N):
                         if len(v) >= 1:
                             candidate_venues.update(v)
                             expert_users.add(expert)
+                            candidates_per_expert[expert] = v
             if len(candidate_venues) >= N or len(expert_users) == len(users_list):
-            # if len(candidate_venues) >= N:
-                return candidate_venues, expert_users
+                return candidate_venues, expert_users, candidates_per_expert
