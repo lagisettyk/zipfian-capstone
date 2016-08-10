@@ -16,6 +16,12 @@ def get_categories():
         categories[key] = value
     return categories
 
+def get_sub_categories_by_category(cat, key):
+    sub_categories = set()
+    for c in cat[key]['categories']:
+        sub_categories.add(c['name'])
+    return sub_categories
+
 def get_sub_categories_names(cat):
     sub_categories = set()
     for key in cat.keys():

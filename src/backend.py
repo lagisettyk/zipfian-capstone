@@ -6,6 +6,9 @@ import location_rating_inference as lr
 from collections import OrderedDict
 from sklearn.metrics import pairwise_distances
 import numpy as np
+from timeit import Timer
+from collections import Counter
+from collections import defaultdict
 
 ### AIzaSyBTT8YSKGtJV9ZVcoVEqHUJuLCLPqXXAto ### Google Maps API key...
 
@@ -36,12 +39,14 @@ def final_candidates(candidates_per_expert, similar_users, user_id, k):
     return final_candidates
 
 def run(latitude=33.842623, longitude=-118.288384079933, userid=27):
-    load_data()
+    #load_data()
     high_level_cat = categories.get_categories()
     user_pref_level1, user_pref_level2 = \
                                     users.build_usr_pref(high_level_cat)
     usr_index = userid
     user_id = user_pref_level1.keys()[usr_index]
+    # usr_location_map = \
+    # getUsrLocationMap(user_pref_level1, user_pref_level2, high_level_cat, user_id)
     sr = venues.SpatialRange(latitude, longitude, 8.0)
     candidate_venues, expert_users, candidates_per_expert = \
                                     candidate_suggestions(sr, usr_index, k=8)
@@ -53,21 +58,55 @@ def run(latitude=33.842623, longitude=-118.288384079933, userid=27):
     suggest_df = venues.get_venues_by_id(suggestions)
     return suggest_df
 
-
-if __name__=='__main__':
-    load_data()
+#def getUsrLocationMap(user_pref_level1, user_pref_level2, high_level_cat, user_id):
+def getUsrLocationMap(latitude=33.842623, longitude=-118.288384079933, usr_index=27):
     high_level_cat = categories.get_categories()
     user_pref_level1, user_pref_level2 = \
                                     users.build_usr_pref(high_level_cat)
-    usr_index = 27
     user_id = user_pref_level1.keys()[usr_index]
-    sr = venues.SpatialRange(33.842623, -118.288384079933, 8.0)
-    candidate_venues, expert_users, candidates_per_expert = \
-                                    candidate_suggestions(sr, usr_index, k=10)
-    # print candidate_venues, expert_users, candidates_per_expert
-    #similar_users = lr.similar_users_rankorder_bycosine(user_id, expert_users)
-    similar_users = lr.similar_users_rankorder(user_id, expert_users)
-    suggestions = \
-        final_candidates(candidates_per_expert, similar_users, user_id, k=5)
-    suggest_df = venues.get_venues_by_id(suggestions)
-    print user_id, suggest_df
+    level_1 = user_pref_level1[user_id]
+    level_2 = user_pref_level2[user_id]
+    counter_level1 = Counter(level_1.rstrip('||').split('||'))
+    counter_level2 = Counter(level_2.rstrip('||').split('||'))
+    #locationMap = []
+
+    locationDict = {}
+    locationDict["name"] = "Top Level: " + str(len(level_1.rstrip('||').split('||')))
+    locationDict["parent"] = "null"
+    locationDict["children"] = []
+    for key, value in counter_level1.iteritems():
+        sub_categories = \
+                categories.get_sub_categories_by_category(high_level_cat, key)
+        filterd_sub_categories =  \
+             [elem for elem in sub_categories if elem in counter_level2.keys()]
+
+        sub_children_dict =\
+        [{"name": filtered_cat + ": " + str(counter_level2[filtered_cat]), "parent":key} \
+        for filtered_cat in filterd_sub_categories]
+        locationDict["children"].append({"name": key + " : " + str(value),\
+            "parent": locationDict["name"], "children": sub_children_dict})
+    return locationDict
+
+
+
+
+
+
+if __name__=='__main__':
+    load_data()
+    #run()
+    locationMap = getUsrLocationMap()
+    # load_data()
+    # high_level_cat = categories.get_categories()
+    # user_pref_level1, user_pref_level2 = \
+    #                                 users.build_usr_pref(high_level_cat)
+    # usr_index = 27
+    # user_id = user_pref_level1.keys()[usr_index]
+    # sr = venues.SpatialRange(33.842623, -118.288384079933, 8.0)
+    # candidate_venues, expert_users, candidates_per_expert = \
+    #                                 candidate_suggestions(sr, usr_index, k=10)
+    # similar_users = lr.similar_users_rankorder(user_id, expert_users)
+    # suggestions = \
+    #     final_candidates(candidates_per_expert, similar_users, user_id, k=5)
+    # suggest_df = venues.get_venues_by_id(suggestions)
+    # print user_id, suggest_df

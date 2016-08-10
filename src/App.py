@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, jsonify
 from flask_googlemaps import GoogleMaps
 from flask_googlemaps import Map
 import backend as service
@@ -12,9 +12,54 @@ app.config['GOOGLEMAPS_KEY'] = "AIzaSyBTT8YSKGtJV9ZVcoVEqHUJuLCLPqXXAto"
 # Initialize the extension
 GoogleMaps(app)
 
+latitude = None
+longitude = None
+userid = None
+
+#### load global data....
+service.load_data()
+
 @app.route("/")
 def home():
     return render_template('index.html')
+
+@app.route("/usrlocationmap")
+def usr_location_map():
+    return render_template('d3-example.html')
+
+@app.route("/locationmap", methods=['GET'])
+def getLocationMap():
+    locationMap = None
+    if latitude == None:
+        locationMap = service.getUsrLocationMap()
+    else:
+        locationMap = service.getUsrLocationMap(latitude, longitude, userid)
+    print request
+    return jsonify([locationMap])
+    # return jsonify([{
+    #     "name": "Top Level",
+    #     "parent": "null",
+    #     "children": [
+    #       {
+    #         "name": "Level 2: A",
+    #         "parent": "Top Level",
+    #         "children": [
+    #           {
+    #             "name": "Son of A",
+    #             "parent": "Level 2: A"
+    #           },
+    #           {
+    #             "name": "Daughter of A",
+    #             "parent": "Level 2: A"
+    #           }
+    #         ]
+    #       },
+    #       {
+    #         "name": "Level 2: B",
+    #         "parent": "Top Level"
+    #       }
+    #     ]
+    #   }])
 
 
 # @app.route('/new', methods=['POST'] )
@@ -27,6 +72,7 @@ def home():
 
 @app.route("/analysis", methods=['POST','GET'])
 def mapview():
+    global latitude, longitude, userid
     suggestions = None
     if len(request.form) != 0:
         latitude = float(request.form["latitude"])
@@ -82,4 +128,4 @@ def mapview():
     # return render_template('example.html', mymap=mymap)
 
 if __name__ == "__main__":
-    app.run(debug=True, port=12345)
+    app.run(debug=True, threaded=True, port=12345)
