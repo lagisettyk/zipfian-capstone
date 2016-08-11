@@ -7,12 +7,12 @@
 <!-- Inline Form -->
 <form class="form-inline" role="form" method='POST'>
   <div class="form-group">
-    <label class="sr-only"  for="latitude2">Longitude</label>
-    <input type="text" class="form-control" name="latitude" id="latittude2" placeholder="Enter latitude">
+    <label class="sr-only"  for="latitude2">Latitude</label>
+    <input type="text" class="form-control" name="latitude" id="latittude2" placeholder="Enter latitude" value="{{ latitude }}" />
     <label class="sr-only"  for="longitude2">Longitude</label>
-    <input type="text" class="form-control" name="longitude" id="longitude2" placeholder="Enter longitude">
-    <label class="sr-only"  for="userid2">Longitude</label>
-    <input type="text" class="form-control" name="userid" id="userid2" placeholder="Enter User ID">
+    <input type="text" class="form-control" name="longitude" id="longitude2" placeholder="Enter longitude" value="{{ longitude }}"/>
+    <label class="sr-only"  for="userid2">User ID</label>
+    <input type="text" class="form-control" name="userid" id="userid2" placeholder="Enter User ID" value="{{ userid }}"/>
   </div>
   <button type="submit" class="btn btn-default">Recommend</button>
 </form>
