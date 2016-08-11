@@ -23,6 +23,32 @@ service.load_data()
 def about():
     return render_template('about.html')
 
+@app.route("/venues")
+def venues():
+    if latitude == None:
+        venues = service.venue_density()
+    else:
+        venues = service.venue_density(latitude=latitude, longitude=longitude)
+    icons = ['http://maps.google.com/mapfiles/ms/icons/red-dot.png']
+    markers = []
+    rec_len = len(venues) if len(venues) <= 5000 else 5000
+    for index in xrange(rec_len):
+        marker = {'icon': icons[0],
+                'lat': venues['latitude'].values[index],
+                'lng': venues['longitude'].values[index],
+                'infobox': "<b>"+venues['Venue_name'].values[index]+"</b>"
+                }
+        markers.append(marker)
+    sndmap = Map(
+        identifier="sndmap",
+        lat= venues['latitude'].values[0],
+        lng= venues['longitude'].values[0],
+        style="height:750px;width:900px;margin:0;",
+        collapsible= True,
+        markers = markers
+    )
+    return render_template('density.html', latitude=latitude, longitude=longitude, userid=userid, sndmap=sndmap)
+
 @app.route("/usrlocationmap")
 def usr_location_map():
     return render_template('d3-example.html', latitude=latitude, longitude=longitude, userid=userid)
@@ -39,45 +65,28 @@ def getLocationMap():
 
 def buildMap(suggestions):
     if len(suggestions) >= 1:
-        print suggestions['Venue_name'].values[0], suggestions['Venue_name'].values[1]
+        print suggestions['Venue_name'].values[0]
+        icons = ['http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+                   'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                   'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                   'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
+                   'http://maps.google.com/mapfiles/ms/icons/orange-dot.png']
+        markers = []
+        rec_len = len(suggestions) if len(suggestions) <= 5 else 5
+        for index in xrange(rec_len):
+            marker = {'icon': icons[index],
+                    'lat': suggestions['latitude'].values[index],
+                    'lng': suggestions['longitude'].values[index],
+                    'infobox': "<b>"+suggestions['Venue_name'].values[index]+"</b>"
+                    }
+            markers.append(marker)
         sndmap = Map(
             identifier="sndmap",
             lat= suggestions['latitude'].values[0],
             lng= suggestions['longitude'].values[0],
             style="height:750px;width:900px;margin:0;",
             collapsible= True,
-            markers=[
-              {
-                 'icon': 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-                 'lat': suggestions['latitude'].values[0],
-                 'lng': suggestions['longitude'].values[0],
-                 'infobox': "<b>"+suggestions['Venue_name'].values[0]+"</b>"
-              },
-              {
-                 'icon': 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-                 'lat': suggestions['latitude'].values[1],
-                 'lng': suggestions['longitude'].values[1],
-                 'infobox': "<b>"+suggestions['Venue_name'].values[1]+"</b>"
-              },
-             {
-               'icon': 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
-               'lat': suggestions['latitude'].values[2],
-               'lng': suggestions['longitude'].values[2],
-               'infobox': "<b>"+suggestions['Venue_name'].values[2]+"</b>"
-             },
-              {
-                'icon': 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
-                'lat': suggestions['latitude'].values[3],
-                'lng': suggestions['longitude'].values[3],
-                'infobox': "<b>"+suggestions['Venue_name'].values[3]+"</b>"
-              },
-               {
-                 'icon': 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png',
-                 'lat':  suggestions['latitude'].values[4],
-                 'lng': suggestions['longitude'].values[4],
-                 'infobox': "<b>"+suggestions['Venue_name'].values[4]+"</b>"
-               }
-            ]
+            markers = markers
         )
     else:
         print "NO LOCATION HISTORY for this user....: ", len(suggestions)
