@@ -55,50 +55,66 @@ def mapview():
         userid = int(request.form["userid"])
         print latitude, longitude, userid
         suggestions = service.run(latitude, longitude, userid)
+        print suggestions['Venue_name'].values[0], suggestions['Venue_name'].values[1]
+        sndmap = Map(
+            identifier="sndmap",
+            lat= suggestions['latitude'].values[0],
+            lng= suggestions['longitude'].values[0],
+            style="height:500px;width:750px;margin:0;",
+            collapsible= True,
+            markers=[
+              {
+                 'icon': 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+                 'lat': suggestions['latitude'].values[0],
+                 'lng': suggestions['longitude'].values[0],
+                 'infobox': "<b>"+suggestions['Venue_name'].values[0]+"</b>"
+              },
+              {
+                 'icon': 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                 'lat': suggestions['latitude'].values[1],
+                 'lng': suggestions['longitude'].values[1],
+                 'infobox': "<b>"+suggestions['Venue_name'].values[1]+"</b>"
+              },
+             {
+               'icon': 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+               'lat': suggestions['latitude'].values[2],
+               'lng': suggestions['longitude'].values[2],
+               'infobox': "<b>"+suggestions['Venue_name'].values[2]+"</b>"
+             },
+              {
+                'icon': 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
+                'lat': suggestions['latitude'].values[3],
+                'lng': suggestions['longitude'].values[3],
+                'infobox': "<b>"+suggestions['Venue_name'].values[3]+"</b>"
+              },
+               {
+                 'icon': 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png',
+                 'lat':  suggestions['latitude'].values[4],
+                 'lng': suggestions['longitude'].values[4],
+                 'infobox': "<b>"+suggestions['Venue_name'].values[4]+"</b>"
+               }
+
+
+            ]
+        )
     else:
-        suggestions = service.run()
-    print suggestions['Venue_name'].values[0], suggestions['Venue_name'].values[1]
-    sndmap = Map(
-        identifier="sndmap",
-        lat= suggestions['latitude'].values[0],
-        lng= suggestions['longitude'].values[0],
-        style="height:500px;width:750px;margin:0;",
-        collapsible= True,
-        markers=[
-          {
-             'icon': 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-             'lat': suggestions['latitude'].values[0],
-             'lng': suggestions['longitude'].values[0],
-             'infobox': "<b>"+suggestions['Venue_name'].values[0]+"</b>"
-          },
-          {
-             'icon': 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-             'lat': suggestions['latitude'].values[1],
-             'lng': suggestions['longitude'].values[1],
-             'infobox': "<b>"+suggestions['Venue_name'].values[1]+"</b>"
-          },
-         {
-           'icon': 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
-           'lat': suggestions['latitude'].values[2],
-           'lng': suggestions['longitude'].values[2],
-           'infobox': "<b>"+suggestions['Venue_name'].values[2]+"</b>"
-         },
-          {
-            'icon': 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
-            'lat': suggestions['latitude'].values[3],
-            'lng': suggestions['longitude'].values[3],
-            'infobox': "<b>"+suggestions['Venue_name'].values[3]+"</b>"
-          },
-           {
-             'icon': 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png',
-             'lat':  suggestions['latitude'].values[4],
-             'lng': suggestions['longitude'].values[4],
-             'infobox': "<b>"+suggestions['Venue_name'].values[4]+"</b>"
-           }
-
-
-        ]
-    )
+        #suggestions = service.run()
+        print "Default MAP Location"
+        sndmap = Map(
+            identifier="sndmap",
+            lat= 33.842623,
+            lng= -118.288384079933,
+            style="height:500px;width:750px;margin:0;",
+            collapsible= True,
+            markers=[
+              {
+                 'icon': 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+                 'lat': 33.842623,
+                 'lng': -118.288384079933,
+                 'infobox': "<b>"+"Hello Please Select a Place"+"</b>"
+              }
+            ]
+        )
     return render_template('recommend.html', sndmap=sndmap)
 
 if __name__ == "__main__":
