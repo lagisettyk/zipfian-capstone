@@ -39,7 +39,13 @@ def final_candidates(candidates_per_expert, similar_users, user_id, k):
             break
     return final_candidates
 
-def run(latitude=33.842623, longitude=-118.288384079933, userid=45):
+def venue_density(latitude=33.842623, longitude=-118.288384079933):
+    sr = venues.SpatialRange(latitude, longitude, 8.0)
+    venue_list = venues.get_venues_sp_range(sr)
+    venues_df = venues.get_venues_by_id(venue_list)
+    return venues_df
+
+def run(latitude=33.842623, longitude=-118.288384079933, userid=99):
     #load_data()
     high_level_cat = categories.get_categories()
     user_pref_level1, user_pref_level2 = \
@@ -72,7 +78,7 @@ def run(latitude=33.842623, longitude=-118.288384079933, userid=45):
     return suggest_df
 
 #def getUsrLocationMap(user_pref_level1, user_pref_level2, high_level_cat, user_id):
-def getUsrLocationMap(latitude=33.842623, longitude=-118.288384079933, usr_index=27):
+def getUsrLocationMap(latitude=33.842623, longitude=-118.288384079933, usr_index=45):
     high_level_cat = categories.get_categories()
     user_pref_level1, user_pref_level2 = \
                                     users.build_usr_pref(high_level_cat)
@@ -107,7 +113,8 @@ def getUsrLocationMap(latitude=33.842623, longitude=-118.288384079933, usr_index
 
 if __name__=='__main__':
     load_data()
-    suggest_df = run()
+    #suggest_df = run()
+    venue_list = venue_density()
     # t = Timer(lambda: run())
     # print "Completed recommendation in %s seconds." % t.timeit(1)
     #locationMap = getUsrLocationMap()

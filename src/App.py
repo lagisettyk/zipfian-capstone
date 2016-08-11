@@ -19,9 +19,9 @@ userid = None
 #### load global data....
 service.load_data()
 
-# @app.route("/")
-# def home():
-#     return render_template('index.html')
+@app.route("/about")
+def about():
+    return render_template('about.html')
 
 @app.route("/usrlocationmap")
 def usr_location_map():
@@ -38,7 +38,7 @@ def getLocationMap():
     return jsonify([locationMap])
 
 def buildMap(suggestions):
-    if len(suggestions) >= 5:
+    if len(suggestions) >= 1:
         print suggestions['Venue_name'].values[0], suggestions['Venue_name'].values[1]
         sndmap = Map(
             identifier="sndmap",
@@ -138,4 +138,4 @@ def mapview():
         return render_template('recommend.html', sndmap=sndmap)
 
 if __name__ == "__main__":
-    app.run(debug=True, port=12345)
+    app.run(debug=True, threaded=True, port=12345)
