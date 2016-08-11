@@ -3,6 +3,7 @@ import json
 from collections import defaultdict
 
 data = None
+categories = {}
 def load_categories():
     global data
     with open('../data/categories.txt') as f:
@@ -10,10 +11,11 @@ def load_categories():
     data = json.loads(unicode(json_str, "ISO-8859-1"))['response']
 
 def get_categories():
-    categories = {}
-    cat_hierachy = {x['name']:x for x in data['categories']}
-    for key, value in cat_hierachy.iteritems():
-        categories[key] = value
+    global categories
+    if not any(categories):
+        cat_hierachy = {x['name']:x for x in data['categories']}
+        for key, value in cat_hierachy.iteritems():
+            categories[key] = value
     return categories
 
 def get_sub_categories_by_category(cat, key):

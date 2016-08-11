@@ -2,6 +2,7 @@ import numpy as np
 import users
 import categories as cat
 from collections import defaultdict
+import time
 
 def cosine_similarity(vec1, vec2):
     norm1 = np.linalg.norm(vec1)
@@ -60,20 +61,32 @@ def entropy_by_level2(usrs):
 def similar_users_rankorder(user_id, expert_users):
     similar_users = []
     high_level_cat = cat.get_categories()
+
+
     user_pref_level1, user_pref_level2 = \
                                     users.build_usr_pref(high_level_cat)
     words_level_1, vectors_level1, words_level_2, vectors_level2 = \
                             users.build_usr_personal_pref_hierarchy()
+
     ls_users_level1 = \
       level_similarity(user_id, expert_users, user_pref_level1, vectors_level1)
     ls_users_level2 = \
       level_similarity(user_id, expert_users, user_pref_level2, vectors_level2)
+
     usrs = expert_users
     usrs.add(user_id)
+
+    start = time.time()
     entropy_level_1 = entropy_by_level1(usrs)
     entropy_level_2 = entropy_by_level2(usrs)
+    end = time.time()
+    print "Time taken for computing entropy levels: ", end - start
+
     usr_entropy_level1 = entropy_level_1[user_id]
     usr_entropy_level2 = entropy_level_2[user_id]
+
+
+
     for expert in expert_users:
         score1 = \
             ls_users_level1[expert] / (1+abs(-usr_entropy_level1 + entropy_level_1[expert]))

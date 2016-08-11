@@ -6,6 +6,8 @@ from collections import OrderedDict
 import categories as cat
 
 users_df = None
+user_pref_level2 = {}
+user_pref_level1 = {}
 
 def load_users_tips():
     global users_df
@@ -63,13 +65,14 @@ def get_peronalpreference_vectors(vocab, user_pref_values):
     return words, vectors
 
 def build_usr_pref(categories):
-    user_pref_level2 = {}
-    user_pref_level1 = {}
-    usrs = users_df['User_ID'].unique()
-    for usr_id in usrs:
-        catids = (users_df[users_df['User_ID']==usr_id])['Category_ID'].values
-        user_pref_level2[usr_id] = categoryid_to_doc(list(catids), categories)
-        user_pref_level1[usr_id] = categoryid_to_doc(list(catids), categories, level=1)
+    global user_pref_level2
+    global user_pref_level1
+    if not any(user_pref_level1):
+        usrs = users_df['User_ID'].unique()
+        for usr_id in usrs:
+            catids = (users_df[users_df['User_ID']==usr_id])['Category_ID'].values
+            user_pref_level2[usr_id] = categoryid_to_doc(list(catids), categories)
+            user_pref_level1[usr_id] = categoryid_to_doc(list(catids), categories, level=1)
     return OrderedDict(user_pref_level1), OrderedDict(user_pref_level2)
 
 def user_venue_scores(usr_location_matrix):

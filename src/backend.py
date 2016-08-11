@@ -7,6 +7,7 @@ from collections import OrderedDict
 from sklearn.metrics import pairwise_distances
 import numpy as np
 from timeit import Timer
+import time
 from collections import Counter
 from collections import defaultdict
 
@@ -48,14 +49,26 @@ def run(latitude=33.842623, longitude=-118.288384079933, userid=27):
     # usr_location_map = \
     # getUsrLocationMap(user_pref_level1, user_pref_level2, high_level_cat, user_id)
     sr = venues.SpatialRange(latitude, longitude, 8.0)
+
+    start = time.time()
     candidate_venues, expert_users, candidates_per_expert = \
                                     candidate_suggestions(sr, usr_index, k=8)
+    end = time.time()
+    print "Predicting candidate recommendations step: ", end - start
     # print candidate_venues, expert_users, candidates_per_expert
     #similar_users = lr.similar_users_rankorder_bycosine(user_id, expert_users)
+    start = time.time()
     similar_users = lr.similar_users_rankorder(user_id, expert_users)
+    end = time.time()
+    print "Finding similar users step: ", end - start
+
+    start = time.time()
     suggestions = \
         final_candidates(candidates_per_expert, similar_users, user_id, k=5)
     suggest_df = venues.get_venues_by_id(suggestions)
+    end = time.time()
+    print "Final suggestions step: ", end - start
+
     return suggest_df
 
 #def getUsrLocationMap(user_pref_level1, user_pref_level2, high_level_cat, user_id):
@@ -95,7 +108,9 @@ def getUsrLocationMap(latitude=33.842623, longitude=-118.288384079933, usr_index
 if __name__=='__main__':
     load_data()
     #run()
-    locationMap = getUsrLocationMap()
+    t = Timer(lambda: run())
+    print "Completed recommendation in %s seconds." % t.timeit(1)
+    #locationMap = getUsrLocationMap()
     # load_data()
     # high_level_cat = categories.get_categories()
     # user_pref_level1, user_pref_level2 = \
