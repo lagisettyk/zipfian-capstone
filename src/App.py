@@ -19,13 +19,13 @@ userid = None
 #### load global data....
 service.load_data()
 
-@app.route("/")
-def home():
-    return render_template('index.html')
+# @app.route("/")
+# def home():
+#     return render_template('index.html')
 
 @app.route("/usrlocationmap")
 def usr_location_map():
-    return render_template('d3-example.html')
+    return render_template('d3-example.html', latitude=latitude, longitude=longitude, userid=userid)
 
 @app.route("/locationmap", methods=['GET'])
 def getLocationMap():
@@ -44,7 +44,7 @@ def buildMap(suggestions):
             identifier="sndmap",
             lat= suggestions['latitude'].values[0],
             lng= suggestions['longitude'].values[0],
-            style="height:500px;width:750px;margin:0;",
+            style="height:750px;width:900px;margin:0;",
             collapsible= True,
             markers=[
               {
@@ -85,7 +85,7 @@ def buildMap(suggestions):
             identifier="sndmap",
             lat= 33.842623,
             lng= -118.288384079933,
-            style="height:500px;width:750px;margin:0;",
+            style="height:750px;width:900px;margin:0;",
             collapsible= True,
             markers=[
               {
@@ -98,7 +98,8 @@ def buildMap(suggestions):
         )
     return sndmap
 
-@app.route("/analysis", methods=['POST','GET'])
+#@app.route("/analysis", methods=['POST','GET'])
+@app.route("/", methods=['POST','GET'])
 def mapview():
     global latitude, longitude, userid
     suggestions = None
@@ -123,7 +124,7 @@ def mapview():
             identifier="sndmap",
             lat= 33.842623,
             lng= -118.288384079933,
-            style="height:500px;width:750px;margin:0;",
+            style="height:750px;width:900px;margin:0;",
             collapsible= True,
             markers=[
               {
