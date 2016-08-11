@@ -39,7 +39,7 @@ def final_candidates(candidates_per_expert, similar_users, user_id, k):
             break
     return final_candidates
 
-def run(latitude=33.842623, longitude=-118.288384079933, userid=27):
+def run(latitude=33.842623, longitude=-118.288384079933, userid=45):
     #load_data()
     high_level_cat = categories.get_categories()
     user_pref_level1, user_pref_level2 = \
@@ -56,7 +56,7 @@ def run(latitude=33.842623, longitude=-118.288384079933, userid=27):
     end = time.time()
     print "Predicting candidate recommendations step: ", end - start
     # print candidate_venues, expert_users, candidates_per_expert
-    #similar_users = lr.similar_users_rankorder_bycosine(user_id, expert_users)
+    # similar_users = lr.similar_users_rankorder_bycosine(user_id, expert_users)
     start = time.time()
     similar_users = lr.similar_users_rankorder(user_id, expert_users)
     end = time.time()
@@ -107,9 +107,9 @@ def getUsrLocationMap(latitude=33.842623, longitude=-118.288384079933, usr_index
 
 if __name__=='__main__':
     load_data()
-    #run()
-    t = Timer(lambda: run())
-    print "Completed recommendation in %s seconds." % t.timeit(1)
+    suggest_df = run()
+    # t = Timer(lambda: run())
+    # print "Completed recommendation in %s seconds." % t.timeit(1)
     #locationMap = getUsrLocationMap()
     # load_data()
     # high_level_cat = categories.get_categories()

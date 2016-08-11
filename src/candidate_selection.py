@@ -42,22 +42,26 @@ def candidate_selection(sr, u_wch, N):
     venue_list = venues.get_venues_sp_range(sr)
     users_list = users.get_visited_users(venue_list)
 
-    while True:
-        for level in xrange(len(u_wch)):
-            ### Iterating over tuples... of word vector and tfidf vectors...
-            tfidfVector = u_wch[level][1]
-            tfidfVector = np.array(tfidfVector)
+    #while True:
+    for level in xrange(len(u_wch)):
+        ### Iterating over tuples... of word vector and tfidf vectors...
+        tfidfVector = u_wch[level][1]
+        tfidfVector = np.array(tfidfVector)
+        if np.nonzero(tfidfVector)[0].size != 0:
             w_min = np.min(tfidfVector[np.nonzero(tfidfVector)]) ##########**********Need to fix this one
-            for index, ct in enumerate(u_wch[level][0]):
-                if u_wch[level][1][index]!= 0.0:
-                    k = u_wch[level][1][index]/w_min ##Caluclate no of users
-                    expert_temp = top_experts(k, users_list, ct)
+        else:
+            w_min = 1.0
+        for index, ct in enumerate(u_wch[level][0]):
+            if u_wch[level][1][index]!= 0.0:
+                k = u_wch[level][1][index]/w_min ##Caluclate no of users
+                expert_temp = top_experts(k, users_list, ct)
 
-                    for expert in expert_temp:
-                        v = matched_venues(expert, venue_list)
-                        if len(v) >= 1:
-                            candidate_venues.update(v)
-                            expert_users.add(expert)
-                            candidates_per_expert[expert] = v
-            if len(candidate_venues) >= N or len(expert_users) == len(users_list):
-                return candidate_venues, expert_users, candidates_per_expert
+                for expert in expert_temp:
+                    v = matched_venues(expert, venue_list)
+                    if len(v) >= 1:
+                        candidate_venues.update(v)
+                        expert_users.add(expert)
+                        candidates_per_expert[expert] = v
+        if len(candidate_venues) >= N or len(expert_users) == len(users_list):
+            return candidate_venues, expert_users, candidates_per_expert
+    return candidate_venues, expert_users, candidates_per_expert
