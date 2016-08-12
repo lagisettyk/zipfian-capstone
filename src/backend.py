@@ -75,46 +75,52 @@ def run(latitude=33.842623, longitude=-118.288384079933, userid=99):
     end = time.time()
     print "Final suggestions step: ", end - start
 
-    return suggest_df
+    return suggest_df, (dict(similar_users)).keys()[0:3]
 
 #def getUsrLocationMap(user_pref_level1, user_pref_level2, high_level_cat, user_id):
+def getUsrLocationMapById(latitude, longitude, user_id):
+
+    high_level_cat = categories.get_categories()
+    user_pref_level1, user_pref_level2 = \
+                                    users.build_usr_pref(high_level_cat)
+    locationDict = {}
+    level_1 = user_pref_level1[user_id]
+    if level_1:
+        level_2 = user_pref_level2[user_id]
+        counter_level1 = Counter(level_1.rstrip('||').split('||'))
+        counter_level2 = Counter(level_2.rstrip('||').split('||'))
+
+
+        locationDict["name"] = "Top Level: " + str(len(level_1.rstrip('||').split('||')))
+        locationDict["parent"] = "null"
+        locationDict["children"] = []
+        for key, value in counter_level1.iteritems():
+            sub_categories = \
+                    categories.get_sub_categories_by_category(high_level_cat, key)
+            filterd_sub_categories =  \
+                 [elem for elem in sub_categories if elem in counter_level2.keys()]
+
+            sub_children_dict =\
+            [{"name": filtered_cat + ": " + str(counter_level2[filtered_cat]), "parent":key} \
+            for filtered_cat in filterd_sub_categories]
+            locationDict["children"].append({"name": key + " : " + str(value),\
+                "parent": locationDict["name"], "children": sub_children_dict})
+    return locationDict
+
 def getUsrLocationMap(latitude=33.842623, longitude=-118.288384079933, usr_index=45):
     high_level_cat = categories.get_categories()
     user_pref_level1, user_pref_level2 = \
                                     users.build_usr_pref(high_level_cat)
     user_id = user_pref_level1.keys()[usr_index]
-    level_1 = user_pref_level1[user_id]
-    level_2 = user_pref_level2[user_id]
-    counter_level1 = Counter(level_1.rstrip('||').split('||'))
-    counter_level2 = Counter(level_2.rstrip('||').split('||'))
-    #locationMap = []
-
-    locationDict = {}
-    locationDict["name"] = "Top Level: " + str(len(level_1.rstrip('||').split('||')))
-    locationDict["parent"] = "null"
-    locationDict["children"] = []
-    for key, value in counter_level1.iteritems():
-        sub_categories = \
-                categories.get_sub_categories_by_category(high_level_cat, key)
-        filterd_sub_categories =  \
-             [elem for elem in sub_categories if elem in counter_level2.keys()]
-
-        sub_children_dict =\
-        [{"name": filtered_cat + ": " + str(counter_level2[filtered_cat]), "parent":key} \
-        for filtered_cat in filterd_sub_categories]
-        locationDict["children"].append({"name": key + " : " + str(value),\
-            "parent": locationDict["name"], "children": sub_children_dict})
-    return locationDict
-
-
-
+    return getUsrLocationMapById(latitude, longitude, user_id)
 
 
 
 if __name__=='__main__':
     load_data()
-    #suggest_df = run()
-    venue_list = venue_density()
+    suggest_df, similar_users = run()
+    locationMap = getUsrLocationMap()
+    #venue_list = venue_density()
     # t = Timer(lambda: run())
     # print "Completed recommendation in %s seconds." % t.timeit(1)
     #locationMap = getUsrLocationMap()
