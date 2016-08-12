@@ -120,7 +120,7 @@ if __name__=='__main__':
     load_data()
     suggest_df, similar_users = run()
     locationMap = getUsrLocationMap()
-    #venue_list = venue_density()
+    venue_list = venue_density()
     # t = Timer(lambda: run())
     # print "Completed recommendation in %s seconds." % t.timeit(1)
     #locationMap = getUsrLocationMap()

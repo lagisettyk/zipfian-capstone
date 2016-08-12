@@ -11,7 +11,8 @@ user_pref_level1 = {}
 
 def load_users_tips():
     global users_df
-    users_df = pd.read_csv('../data/Tips/LA/LA-User-Tips-2500.csv')
+    #users_df = pd.read_csv('../data/Tips/LA/LA-User-Tips-2500.csv')
+    users_df = pd.read_csv('../preprocessed/Tips/LA/LA-User-Tips-2500.csv')
 
 def get_visited_users(venue_list):
     return users_df[users_df['Venue_ID'].isin(venue_list)]['User_ID'].values
@@ -97,17 +98,25 @@ def user_venue_scores_by_venue_precompute(cat_id):
     return user_hub_score, venue_hub_score, users_index, usr_location_matrix
 
 def user_venue_scores_by_category(key):
-    user_hub_score = np.load('../data/scores/'+key+'_user_hub_score.npy')
-    venue_hub_score = np.load('../data/scores/'+key+'_venue_hub_score.npy')
-    users_index = np.load('../data/scores/'+key+'_users_index.npy')
-    usr_location_matrix = np.load('../data/scores/'+ key+"_users_location_matrix.npy")
+    # user_hub_score = np.load('../data/scores/'+key+'_user_hub_score.npy')
+    # venue_hub_score = np.load('../data/scores/'+key+'_venue_hub_score.npy')
+    # users_index = np.load('../data/scores/'+key+'_users_index.npy')
+    # usr_location_matrix = np.load('../data/scores/'+ key+"_users_location_matrix.npy")
+    user_hub_score = np.load('../preprocessed/scores/'+key+'_user_hub_score.npy')
+    venue_hub_score = np.load('../preprocessed/scores/'+key+'_venue_hub_score.npy')
+    users_index = np.load('../preprocessed/scores/'+key+'_users_index.npy')
+    usr_location_matrix = np.load('../preprocessed/scores/'+ key+"_users_location_matrix.npy")
     return user_hub_score, venue_hub_score, users_index, usr_location_matrix
 
 def user_venue_scores_by_venue(key):
-    user_hub_score = np.load('../data/scores/'+key+'_user_hub_score.npy')
-    venue_hub_score = np.load('../data/scores/'+key+'_venue_hub_score.npy')
-    users_index = np.load('../data/scores/'+key+'_users_index.npy')
-    usr_location_matrix = np.load('../data/scores/'+ key+"_users_location_matrix.npy")
+    # user_hub_score = np.load('../data/scores/'+key+'_user_hub_score.npy')
+    # venue_hub_score = np.load('../data/scores/'+key+'_venue_hub_score.npy')
+    # users_index = np.load('../data/scores/'+key+'_users_index.npy')
+    # usr_location_matrix = np.load('../data/scores/'+ key+"_users_location_matrix.npy")
+    user_hub_score = np.load('../preprocessed/scores/'+key+'_user_hub_score.npy')
+    venue_hub_score = np.load('../preprocessed/scores/'+key+'_venue_hub_score.npy')
+    users_index = np.load('../preprocessed/scores/'+key+'_users_index.npy')
+    usr_location_matrix = np.load('../preprocessed/scores/'+ key+"_users_location_matrix.npy")
     return user_hub_score, venue_hub_score, users_index, usr_location_matrix
 
 def build_usr_personal_pref_hierarchy():

@@ -25,7 +25,8 @@ class SpatialRange(object):
 def load_venues():
     global venues_df
     venues = []
-    with open('../data/Venues/LA/LA-Venues.txt') as f:
+    #with open('../data/Venues/LA/LA-Venues.txt') as f:
+    with open('../preprocessed/Venues/LA/LA-Venues.txt') as f:
         for line in f:
             venues.append(line.strip().split('\t')[:14])
     df = pd.DataFrame(venues)
