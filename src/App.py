@@ -73,7 +73,7 @@ def getLocationMap():
         locationMap = service.getUsrLocationMapById(latitude, longitude, expert_id)
     else:
         locationMap = service.getUsrLocationMap(latitude, longitude, userid)
-    return jsonify([locationMap])
+    return jsonify(results=[locationMap])
 
 def buildMap(suggestions):
     print len(suggestions), suggestions['Venue_name']
@@ -159,4 +159,4 @@ def mapview():
         return render_template('recommend.html', sndmap=sndmap)
 
 if __name__ == "__main__":
-    app.run(debug=True, threaded=True, port=12345)
+    app.run(host="0.0.0.0", threaded=True, port=8000)
