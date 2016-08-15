@@ -6,8 +6,7 @@ data = None
 categories = {}
 def load_categories():
     global data
-    #with open('../data/categories.txt') as f:
-    with open('../preprocessed/categories.txt') as f:
+    with open('../pre_500/categories.txt') as f:
         json_str = f.read()
     data = json.loads(unicode(json_str, "ISO-8859-1"))['response']
 

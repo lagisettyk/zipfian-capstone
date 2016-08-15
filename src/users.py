@@ -6,13 +6,45 @@ from collections import OrderedDict
 import categories as cat
 
 users_df = None
-user_pref_level2 = {}
-user_pref_level1 = {}
+#user_pref_level2 = {}
+#user_pref_level1 = {}
+users_NJ = None
+city = None
+
+def load_users():
+    global users_NJ
+    usrs = []
+    with open('../data/Users/LA/LA-Users.txt') as f:
+        for line in f:
+            row = line.strip().split('\t')
+            city = row[-1].split(',')
+            if len(city) == 2:
+                usrs.append([row[0], city[0].strip('"'), city[1].strip('"').strip()])
+
+    with open('../data/Users/NYC/NYC-Users.txt') as f:
+        for line in f:
+            row = line.strip().split('\t')
+            city = row[-1].split(',')
+            if len(city) == 2:
+                usrs.append([row[0], city[0].strip('"'), city[1].strip('"').strip()])
+
+    df = pd.DataFrame(usrs)
+    cols = ['User id', 'city', 'state']
+    df.columns = cols
+    users_NJ = df[df['state']=='NJ']
+
+
+def load_users_tips_500():
+    global users_df, city
+    users_df = pd.read_csv('../pre_500/Tips/NYC/NYC-User-Tips-500.csv')
 
 def load_users_tips():
-    global users_df
-    #users_df = pd.read_csv('../data/Tips/LA/LA-User-Tips-2500.csv')
-    users_df = pd.read_csv('../preprocessed/Tips/LA/LA-User-Tips-2500.csv')
+    global users_df, city
+    print "+++++++++++==========: ", city
+    if city != 'LA':
+        users_df = pd.read_csv('../pre_500/Tips/NYC/NYC-User-Tips-500.csv')
+    else:
+        users_df = pd.read_csv('../pre_500/Tips/LA/LA-User-Tips-500.csv')
 
 def get_visited_users(venue_list):
     return users_df[users_df['Venue_ID'].isin(venue_list)]['User_ID'].values
@@ -66,8 +98,10 @@ def get_peronalpreference_vectors(vocab, user_pref_values):
     return words, vectors
 
 def build_usr_pref(categories):
-    global user_pref_level2
-    global user_pref_level1
+    # global user_pref_level2
+    # global user_pref_level1
+    user_pref_level2 = {}
+    user_pref_level1 = {}
     if not any(user_pref_level1):
         usrs = users_df['User_ID'].unique()
         for usr_id in usrs:
@@ -98,25 +132,29 @@ def user_venue_scores_by_venue_precompute(cat_id):
     return user_hub_score, venue_hub_score, users_index, usr_location_matrix
 
 def user_venue_scores_by_category(key):
-    # user_hub_score = np.load('../data/scores/'+key+'_user_hub_score.npy')
-    # venue_hub_score = np.load('../data/scores/'+key+'_venue_hub_score.npy')
-    # users_index = np.load('../data/scores/'+key+'_users_index.npy')
-    # usr_location_matrix = np.load('../data/scores/'+ key+"_users_location_matrix.npy")
-    user_hub_score = np.load('../preprocessed/scores/'+key+'_user_hub_score.npy')
-    venue_hub_score = np.load('../preprocessed/scores/'+key+'_venue_hub_score.npy')
-    users_index = np.load('../preprocessed/scores/'+key+'_users_index.npy')
-    usr_location_matrix = np.load('../preprocessed/scores/'+ key+"_users_location_matrix.npy")
+    if city != 'LA':
+        user_hub_score = np.load('../pre_500/scores/'+key+'_nyc_user_hub_score.npy')
+        venue_hub_score = np.load('../pre_500/scores/'+key+'_nyc_venue_hub_score.npy')
+        users_index = np.load('../pre_500/scores/'+key+'_nyc_users_index.npy')
+        usr_location_matrix = np.load('../pre_500/scores/'+ key+"_nyc_users_location_matrix.npy")
+    else:
+        user_hub_score = np.load('../pre_500/scores/'+key+'_user_hub_score.npy')
+        venue_hub_score = np.load('../pre_500/scores/'+key+'_venue_hub_score.npy')
+        users_index = np.load('../pre_500/scores/'+key+'_users_index.npy')
+        usr_location_matrix = np.load('../pre_500/scores/'+ key+"_users_location_matrix.npy")
     return user_hub_score, venue_hub_score, users_index, usr_location_matrix
 
 def user_venue_scores_by_venue(key):
-    # user_hub_score = np.load('../data/scores/'+key+'_user_hub_score.npy')
-    # venue_hub_score = np.load('../data/scores/'+key+'_venue_hub_score.npy')
-    # users_index = np.load('../data/scores/'+key+'_users_index.npy')
-    # usr_location_matrix = np.load('../data/scores/'+ key+"_users_location_matrix.npy")
-    user_hub_score = np.load('../preprocessed/scores/'+key+'_user_hub_score.npy')
-    venue_hub_score = np.load('../preprocessed/scores/'+key+'_venue_hub_score.npy')
-    users_index = np.load('../preprocessed/scores/'+key+'_users_index.npy')
-    usr_location_matrix = np.load('../preprocessed/scores/'+ key+"_users_location_matrix.npy")
+    if city != 'LA':
+        user_hub_score = np.load('../pre_500/scores/'+key+'_nyc_user_hub_score.npy')
+        venue_hub_score = np.load('../pre_500/scores/'+key+'_nyc_venue_hub_score.npy')
+        users_index = np.load('../pre_500/scores/'+key+'_nyc_users_index.npy')
+        usr_location_matrix = np.load('../pre_500/scores/'+ key+"_nyc_users_location_matrix.npy")
+    else:
+        user_hub_score = np.load('../pre_500/scores/'+key+'_user_hub_score.npy')
+        venue_hub_score = np.load('../pre_500/scores/'+key+'_venue_hub_score.npy')
+        users_index = np.load('../pre_500/scores/'+key+'_users_index.npy')
+        usr_location_matrix = np.load('../pre_500/scores/'+ key+"_users_location_matrix.npy")
     return user_hub_score, venue_hub_score, users_index, usr_location_matrix
 
 def build_usr_personal_pref_hierarchy():
@@ -134,3 +172,4 @@ def build_usr_personal_pref_hierarchy():
 
 if __name__=='__main__':
     load_users_tips()
+    load_users()

@@ -16,6 +16,9 @@ from collections import defaultdict
 def load_data():
     categories.load_categories()
     venues.load_venues()
+
+def load_users_tips(city):
+    users.city = city
     users.load_users_tips()
 
 def candidate_suggestions(sr, usr_index, k):
@@ -46,19 +49,21 @@ def venue_density(latitude=33.842623, longitude=-118.288384079933):
     return venues_df
 
 def run(latitude=33.842623, longitude=-118.288384079933, userid=99):
-    #load_data()
+    venues_df = venue_density(latitude, longitude)
+    sr = venues.SpatialRange(latitude, longitude, 8.0)
+    if '"CA"' in venues_df.state.values:
+        load_users_tips('LA')
+    else:
+        load_users_tips('NYC')
     high_level_cat = categories.get_categories()
     user_pref_level1, user_pref_level2 = \
                                     users.build_usr_pref(high_level_cat)
     usr_index = userid
     user_id = user_pref_level1.keys()[usr_index]
-    # usr_location_map = \
-    # getUsrLocationMap(user_pref_level1, user_pref_level2, high_level_cat, user_id)
-    sr = venues.SpatialRange(latitude, longitude, 8.0)
 
     start = time.time()
     candidate_venues, expert_users, candidates_per_expert = \
-                                    candidate_suggestions(sr, usr_index, k=8)
+                                    candidate_suggestions(sr, usr_index, k=12)
     end = time.time()
     print "Predicting candidate recommendations step: ", end - start
     # print candidate_venues, expert_users, candidates_per_expert
@@ -118,9 +123,10 @@ def getUsrLocationMap(latitude=33.842623, longitude=-118.288384079933, usr_index
 
 if __name__=='__main__':
     load_data()
-    suggest_df, similar_users = run()
-    locationMap = getUsrLocationMap()
-    venue_list = venue_density()
+    suggest_df, similar_users = run(40.712985, -74.007527, 21)
+    suggest_df, similar_users = run(33.842623, -118.288384079933, 21)
+    # locationMap = getUsrLocationMap()
+    # venue_list = venue_density()
     # t = Timer(lambda: run())
     # print "Completed recommendation in %s seconds." % t.timeit(1)
     #locationMap = getUsrLocationMap()

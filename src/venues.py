@@ -25,10 +25,13 @@ class SpatialRange(object):
 def load_venues():
     global venues_df
     venues = []
-    #with open('../data/Venues/LA/LA-Venues.txt') as f:
-    with open('../preprocessed/Venues/LA/LA-Venues.txt') as f:
+    with open('../pre_500/Venues/NYC/NYC-Venues.txt') as f:
         for line in f:
             venues.append(line.strip().split('\t')[:14])
+    with open('../pre_500/Venues/LA/LA-Venues.txt') as f:
+        for line in f:
+            venues.append(line.strip().split('\t')[:14])
+
     df = pd.DataFrame(venues)
     cols = ['Venue_id', 'Venue_name', 'latitude', 'longitude', \
      'address', 'city', 'state', 'checkin_#', 'checked_user#', 'current_user#',\
