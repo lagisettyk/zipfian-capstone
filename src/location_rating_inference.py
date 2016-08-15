@@ -92,9 +92,10 @@ def similar_users_rankorder(user_id, expert_users):
             ls_users_level1[expert] / (1+abs(-usr_entropy_level1 + entropy_level_1[expert]))
         score2 = \
              2 * (ls_users_level2[expert] / (1+abs(-usr_entropy_level2 + entropy_level_2[expert])))
+
         if expert != user_id:
             similar_users.append((expert, score1+score2))
-    return similar_users
+    return sorted(similar_users, key=lambda x: x[1], reverse=True)
 
 if __name__ == "__main__":
     cat.load_categories()

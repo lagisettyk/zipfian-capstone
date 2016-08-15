@@ -82,9 +82,15 @@ def buildMap(suggestions):
                    'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
                    'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
                    'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
-                   'http://maps.google.com/mapfiles/ms/icons/orange-dot.png']
+                   'http://maps.google.com/mapfiles/ms/icons/orange-dot.png',
+                   'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+                              'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                              'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                              'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
+                              'http://maps.google.com/mapfiles/ms/icons/orange-dot.png']
         markers = []
-        rec_len = len(suggestions) if len(suggestions) <= 5 else 5
+        rec_len = len(suggestions) if len(suggestions) <= 10 else 10
+        print "++++=====+++++: ", rec_len
         for index in xrange(rec_len):
             marker = {'icon': icons[index],
                     'lat': suggestions['latitude'].values[index],
